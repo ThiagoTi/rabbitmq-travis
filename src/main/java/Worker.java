@@ -8,7 +8,7 @@ import java.util.concurrent.TimeoutException;
 
 public class Worker {
 
-    private final static String QUEUE_NAME = "hello";
+    private final static String QUEUE_NAME = "task";
 
     public Worker() {
     }
@@ -27,10 +27,11 @@ public class Worker {
         });
     }
 
-    public static void doWork(String task) throws InterruptedException {
+    public static void doWork(String task) {
+        System.out.println("start to work...");
+
         for (char ch : task.toCharArray()) {
             System.out.println("working...");
-            Thread.sleep(1000);
         }
     }
 }

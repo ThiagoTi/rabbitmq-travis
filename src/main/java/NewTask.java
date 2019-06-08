@@ -7,7 +7,7 @@ import java.util.concurrent.TimeoutException;
 
 public class NewTask {
 
-    private final static String QUEUE_NAME = "hello";
+    private final static String QUEUE_NAME = "task";
 
     public NewTask() {
     }

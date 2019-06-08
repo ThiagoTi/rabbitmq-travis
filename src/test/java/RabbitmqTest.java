@@ -4,12 +4,14 @@ import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.unit.Async;
 import io.vertx.reactivex.ext.unit.TestContext;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
 @RunWith(VertxUnitRunner.class)
@@ -19,8 +21,8 @@ public class RabbitmqTest {
 
     private static Vertx vertx;
 
-    @Before
-    public void setUp(){
+    @BeforeClass
+    public static void setUp() {
         VertxOptions options = new VertxOptions();
         options.setBlockedThreadCheckInterval(1000 * 60 * 60);
 
@@ -36,7 +38,7 @@ public class RabbitmqTest {
         final Sender sender = new Sender();
 
         receiver.createReceiver((consumerTag, delivery) -> {
-            String message = new String(delivery.getBody(), "UTF-8");
+            String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
             System.out.println(" [x] Received '" + message + "'");
             context.assertEquals("Hello World!", message);
             async.complete();
@@ -56,18 +58,14 @@ public class RabbitmqTest {
         final Worker worker = new Worker();
 
         worker.createReceiver((consumerTag, delivery) -> {
-            String message = new String(delivery.getBody(), "UTF-8");
+            String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
             System.out.println(" [x] Received '" + message + "'");
-            try {
-                Worker.doWork(message);
-                async.complete();
 
-            } catch (InterruptedException e) {
-                context.fail();
-            } finally {
-                System.out.println(" [x] Done");
-            }
+            worker.doWork(message);
+
             context.assertEquals("new task", message);
+            System.out.println(" [x] Done");
+            async.complete();
         });
 
         newTask.createSenderAndSendMessage();
