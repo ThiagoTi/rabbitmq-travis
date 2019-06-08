@@ -4,5 +4,8 @@ branches:
   only:
     - master
 services: rabbitmq
-install:
-  - mvn install -DskipTests=true
+install: true
+script: ./mvnw clean install
+cache:
+  directories:
+    - $HOME/.m2
