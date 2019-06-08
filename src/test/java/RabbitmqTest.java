@@ -12,10 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 @RunWith(VertxUnitRunner.class)
 public class RabbitmqTest {
 
@@ -36,8 +32,6 @@ public class RabbitmqTest {
         TestContext context = new TestContext(ctx);
         Async async = context.async();
 
-        logger.info("This is how you configure Java Logging with SLF4J");
-
         final Receiver receiver = new Receiver();
         final Sender sender = new Sender();
 
@@ -49,6 +43,34 @@ public class RabbitmqTest {
         });
 
         sender.createSenderAndSendMessage();
+
+        async.awaitSuccess();
+    }
+
+    @Test
+    public void test2(io.vertx.ext.unit.TestContext ctx) throws IOException, TimeoutException {
+        TestContext context = new TestContext(ctx);
+        Async async = context.async();
+
+        final NewTask newTask = new NewTask();
+        final Worker worker = new Worker();
+
+        worker.createReceiver((consumerTag, delivery) -> {
+            String message = new String(delivery.getBody(), "UTF-8");
+            System.out.println(" [x] Received '" + message + "'");
+            try {
+                Worker.doWork(message);
+                async.complete();
+
+            } catch (InterruptedException e) {
+                context.fail();
+            } finally {
+                System.out.println(" [x] Done");
+            }
+            context.assertEquals("new task", message);
+        });
+
+        newTask.createSenderAndSendMessage();
 
         async.awaitSuccess();
     }
