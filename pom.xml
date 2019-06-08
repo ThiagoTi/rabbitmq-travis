@@ -8,6 +8,24 @@
     <artifactId>rabbitmq-travis</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <properties>
+        <vertx.version>3.7.0</vertx.version>
+        <log4j.version>2.8</log4j.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-dependencies</artifactId>
+                <version>${vertx.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!--  rabbitmq  -->
         <dependency>
