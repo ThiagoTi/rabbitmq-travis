@@ -3,7 +3,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.unit.Async;
 import io.vertx.reactivex.ext.unit.TestContext;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,10 +36,11 @@ public class RabbitmqTest {
         final Receiver receiver = new Receiver();
         final Sender sender = new Sender();
 
-        receiver.createReceiver((consumerTag, delivery) -> {
+        receiver.createReceiver("test1", (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-            System.out.println(" [x] Received '" + message + "'");
+            System.out.println("test1 - [x] Received '" + message + "', tag => " + consumerTag);
             context.assertEquals("Hello World!", message);
+            System.out.println("test1 - [x] Done");
             async.complete();
         });
 
@@ -57,18 +57,39 @@ public class RabbitmqTest {
         final NewTask newTask = new NewTask();
         final Worker worker = new Worker();
 
-        worker.createReceiver((consumerTag, delivery) -> {
+        worker.createReceiver("test2", (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-            System.out.println(" [x] Received '" + message + "'");
+            System.out.println("test2 - [x] Received '" + message + "', tag => " + consumerTag);
 
             worker.doWork(message);
 
             context.assertEquals("new task", message);
-            System.out.println(" [x] Done");
+            System.out.println("test2 - [x] Done");
             async.complete();
         });
 
         newTask.createSenderAndSendMessage();
+
+        async.awaitSuccess();
+    }
+
+    @Test
+    public void test3(io.vertx.ext.unit.TestContext ctx) throws IOException, TimeoutException {
+        TestContext context = new TestContext(ctx);
+        Async async = context.async();
+
+        final ReceiveLog receiveLog = new ReceiveLog();
+        final EmitLog emitLog = new EmitLog();
+
+        receiveLog.createReceiver("test3", (consumerTag, delivery) -> {
+            String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+            System.out.println("test3 - [x] Received '" + message + "', tag => " + consumerTag);
+            context.assertEquals("log", message);
+            System.out.println("test3 - [x] Done");
+            async.complete();
+        });
+
+        emitLog.createSenderAndSendMessage();
 
         async.awaitSuccess();
     }

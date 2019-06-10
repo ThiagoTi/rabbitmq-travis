@@ -6,11 +6,11 @@ import com.rabbitmq.client.DeliverCallback;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public class Receiver {
+public class ReceiveLog {
 
-    private final static String QUEUE_NAME = "hello";
+    private static final String EXCHANGE_NAME = "logs";
 
-    public Receiver() {
+    public ReceiveLog() {
     }
 
     public void createReceiver(String name, DeliverCallback deliverCallback) throws IOException, TimeoutException {
@@ -19,9 +19,14 @@ public class Receiver {
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+        channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
+        String queueName = channel.queueDeclare().getQueue();
+        channel.queueBind(queueName, EXCHANGE_NAME, "");
+
         System.out.println(name + "- [*] Waiting for messages. To exit press CTRL+C");
 
-        channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> { });
+        boolean autoAck = true; // acknowledgment is covered below
+        channel.basicConsume(queueName, autoAck, deliverCallback, consumerTag -> {
+        });
     }
 }

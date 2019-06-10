@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
-public class NewTask {
+public class EmitLog {
 
-    private final static String QUEUE_NAME = "task";
+    private final static String EXCHANGE_NAME = "logs";
 
-    public NewTask() {
+    public EmitLog() {
     }
 
     public void createSenderAndSendMessage() throws IOException, TimeoutException {
@@ -18,9 +18,11 @@ public class NewTask {
         factory.setHost("localhost");
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
-            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-            String message = "new task";
-            channel.basicPublish("", QUEUE_NAME, null, message.getBytes(StandardCharsets.UTF_8));
+            channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
+
+            String message = "log";
+
+            channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes(StandardCharsets.UTF_8));
             System.out.println(" [x] Sent '" + message + "'");
         }
     }

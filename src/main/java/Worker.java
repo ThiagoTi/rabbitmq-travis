@@ -13,14 +13,14 @@ public class Worker {
     public Worker() {
     }
 
-    public void createReceiver(DeliverCallback deliverCallback) throws IOException, TimeoutException {
+    public void createReceiver(String name, DeliverCallback deliverCallback) throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
         channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-        System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
+        System.out.println(name + "- [*] Waiting for messages. To exit press CTRL+C");
 
         boolean autoAck = true; // acknowledgment is covered below
         channel.basicConsume(QUEUE_NAME, autoAck, deliverCallback, consumerTag -> {
