@@ -1,3 +1,5 @@
+package consumer;
+
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -6,11 +8,11 @@ import com.rabbitmq.client.DeliverCallback;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public class ReceiveLog {
+public class Receiver {
 
-    private static final String EXCHANGE_NAME = "logs";
+    private final static String QUEUE_NAME = "hello";
 
-    public ReceiveLog() {
+    public Receiver() {
     }
 
     public void createReceiver(String name, DeliverCallback deliverCallback) throws IOException, TimeoutException {
@@ -19,14 +21,9 @@ public class ReceiveLog {
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
-        channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
-        String queueName = channel.queueDeclare().getQueue();
-        channel.queueBind(queueName, EXCHANGE_NAME, "");
-
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
         System.out.println(name + "- [*] Waiting for messages. To exit press CTRL+C");
 
-        boolean autoAck = true; // acknowledgment is covered below
-        channel.basicConsume(queueName, autoAck, deliverCallback, consumerTag -> {
-        });
+        channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> { });
     }
 }
