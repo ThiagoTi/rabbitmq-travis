@@ -19,7 +19,7 @@ import java.util.concurrent.TimeoutException;
 @RunWith(VertxUnitRunner.class)
 public class RabbitmqTest2 {
 
-    private static final Logger logger = LoggerFactory.getLogger(RabbitmqTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(RabbitmqTest2.class);
     private static final String EXCHANGE_NAME = "direct_logs";
 
     private static Vertx vertx;
@@ -62,11 +62,11 @@ public class RabbitmqTest2 {
         TestContext context = new TestContext(ctx);
         Async async = context.async();
 
-        createReceiver("test4", (consumerTag, delivery) -> {
+        createReceiver("test5", (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-            logger.debug("test4 - [x] Received '" + delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
+            logger.debug("test5 - [x] Received '" + delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
             context.assertEquals("direct_log", message);
-            logger.debug("test4 - [x] Done");
+            logger.debug("test5 - [x] Done");
             async.complete();
         });
 
