@@ -33,10 +33,7 @@ public class RabbitmqTest2 {
         TestContext context = new TestContext(ctx);
         Async async = context.async();
 
-        VertxOptions options = new VertxOptions();
-        options.setBlockedThreadCheckInterval(1000 * 60 * 60);
-
-        vertx = Vertx.vertx(options);
+        vertx = Vertx.vertx();
 
         async.complete();
         async.awaitSuccess();
@@ -61,7 +58,7 @@ public class RabbitmqTest2 {
 
 
     @Test
-    public void test4(io.vertx.ext.unit.TestContext ctx) throws IOException, TimeoutException {
+    public void test5(io.vertx.ext.unit.TestContext ctx) throws IOException, TimeoutException {
         TestContext context = new TestContext(ctx);
         Async async = context.async();
 
