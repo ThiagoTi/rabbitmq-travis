@@ -9,14 +9,17 @@ public class ReceiveLogDirect {
 
     private static final String EXCHANGE_NAME = "direct_logs";
 
+    private Connection connection;
+    private Channel channel;
+
     public ReceiveLogDirect() {
     }
 
     public void createReceiver(String name, DeliverCallback deliverCallback) throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
-        Connection connection = factory.newConnection();
-        Channel channel = connection.createChannel();
+        this.connection = factory.newConnection();
+        this.channel = connection.createChannel();
 
         channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT);
         String queueName = channel.queueDeclare().getQueue();
@@ -27,5 +30,10 @@ public class ReceiveLogDirect {
         boolean autoAck = true; // acknowledgment is covered below
         channel.basicConsume(queueName, autoAck, deliverCallback, consumerTag -> {
         });
+    }
+
+    public void closeReceiver() throws IOException, TimeoutException {
+        this.channel.close();
+        this.connection.close();
     }
 }

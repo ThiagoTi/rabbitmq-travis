@@ -102,24 +102,29 @@ public class RabbitmqTest {
         async.awaitSuccess();
     }
 
-    @Test
-    public void test4(io.vertx.ext.unit.TestContext ctx) throws IOException, TimeoutException {
-        TestContext context = new TestContext(ctx);
-        Async async = context.async();
+     @Test
+     public void test4(io.vertx.ext.unit.TestContext ctx) throws IOException, TimeoutException {
+         TestContext context = new TestContext(ctx);
+         Async async = context.async();
 
-        final ReceiveLogDirect receiveLogDirect = new ReceiveLogDirect();
-        final EmitLogDirect emitLogDirect = new EmitLogDirect();
+         final ReceiveLogDirect receiveLogDirect = new ReceiveLogDirect();
+         final EmitLogDirect emitLogDirect = new EmitLogDirect();
 
-        receiveLogDirect.createReceiver("test4", (consumerTag, delivery) -> {
-            String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-            System.out.println("test4 - [x] Received '" + delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
-            context.assertEquals("direct_log", message);
-            System.out.println("test4 - [x] Done");
-            async.complete();
-        });
+         receiveLogDirect.createReceiver("test4", (consumerTag, delivery) -> {
+             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+             System.out.println("test4 - [x] Received '" + delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
+             context.assertEquals("direct_log", message);
+             System.out.println("test4 - [x] Done");
+             try {
+                 receiveLogDirect.closeReceiver();
+             } catch (TimeoutException e) {
+                 context.fail(e);
+             }
+             async.complete();
+         });
 
-        emitLogDirect.createSenderAndSendMessage();
+         emitLogDirect.createSenderAndSendMessage();
 
-        async.awaitSuccess();
-    }
+         async.awaitSuccess();
+     }
 }

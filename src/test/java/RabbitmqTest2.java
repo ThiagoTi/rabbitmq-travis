@@ -29,14 +29,8 @@ public class RabbitmqTest2 {
     private Channel channel;
 
     @BeforeClass
-    public static void setUp(io.vertx.ext.unit.TestContext ctx) {
-        TestContext context = new TestContext(ctx);
-        Async async = context.async();
-
+    public static void setUp() {
         vertx = Vertx.vertx();
-
-        async.complete();
-        async.awaitSuccess();
     }
 
     @Before
@@ -56,7 +50,6 @@ public class RabbitmqTest2 {
         this.connection.close();
     }
 
-
     @Test
     public void test5(io.vertx.ext.unit.TestContext ctx) throws IOException, TimeoutException {
         TestContext context = new TestContext(ctx);
@@ -65,7 +58,7 @@ public class RabbitmqTest2 {
         createReceiver("test5", (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
             logger.debug("test5 - [x] Received '" + delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
-            context.assertEquals("direct_log", message);
+            context.assertEquals("direct_log 2", message);
             logger.debug("test5 - [x] Done");
             async.complete();
         });
@@ -93,7 +86,7 @@ public class RabbitmqTest2 {
              Channel channel = connection.createChannel()) {
             channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT);
 
-            String message = "direct_log";
+            String message = "direct_log 2";
             String routingKey = "error";
 
             channel.basicPublish(EXCHANGE_NAME, routingKey, null, message.getBytes(StandardCharsets.UTF_8));
